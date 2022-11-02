@@ -1,0 +1,23 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 2021
+  },
+  "extends": ["airbnb", "prettier", "plugin:prettier/recommended"],
+  "plugins": ["prettier"],
+  "rules": {
+    "eqeqeq": "error",
+    "prettier/prettier": ["warn", { "endOfLine": "auto" }],
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "always",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ],
+    "no-unused-vars": "warn",
+    "no-console": "off",
+    "func-names": "off",
+    "object-shorthand": "off"
+  }
+}
