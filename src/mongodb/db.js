@@ -1,7 +1,7 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-mongoose.connect(`mongodb://localhost:${process.env.PORT}/ratingsReviews`);
+mongoose.connect(`mongodb://localhost:${process.env.MONGODB_PORT}/ratingsReviews`);
 
 const characteristicSchema = new mongoose.Schema({
   name: { type: String, required: true },
