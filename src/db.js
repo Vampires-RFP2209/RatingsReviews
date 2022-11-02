@@ -1,4 +1,9 @@
-const reviews = new Schema(
+require('dotenv').config();
+const mongoose = require('mongoose');
+
+mongoose.connect(`mongodb://localhost:${process.env.PORT}/ratingsReviews`);
+
+const reviewSchema = new mongoose.Schema(
   {
     rating: { type: Number, required: true },
     summary: { type: String, maxLength: 60 },
@@ -22,3 +27,7 @@ const reviews = new Schema(
     timestamps: true,
   }
 );
+
+const Review = mongoose.model('Review', reviewSchema);
+
+module.exports = Review;
