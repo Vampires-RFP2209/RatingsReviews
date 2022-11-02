@@ -3,6 +3,12 @@ const mongoose = require('mongoose');
 
 mongoose.connect(`mongodb://localhost:${process.env.PORT}/ratingsReviews`);
 
+const characteristicSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  characteristic_id: { type: Number, required: true },
+  value: { type: Number, required: true },
+});
+
 const reviewSchema = new mongoose.Schema(
   {
     rating: { type: Number, required: true },
@@ -22,7 +28,7 @@ const reviewSchema = new mongoose.Schema(
       },
     },
     photos: { type: [String], required: true },
-    characteristics: { type: Map, required: true },
+    characteristics: { type: [characteristicSchema], required: true },
   },
   {
     timestamps: true,
@@ -30,5 +36,6 @@ const reviewSchema = new mongoose.Schema(
 );
 
 const Review = mongoose.model('Review', reviewSchema);
+const Characteristic = mongoose.model('Characteristic', characteristicSchema);
 
-module.exports = Review;
+module.exports = { Review, Characteristic };
