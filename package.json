@@ -32,7 +32,6 @@
   "dependencies": {
     "dotenv": "^16.0.3",
     "mongoose": "^6.7.0",
-    "mysql2": "^2.3.3",
-    "sequelize": "^6.25.3"
+    "mysql2": "^2.3.3"
   }
 }
