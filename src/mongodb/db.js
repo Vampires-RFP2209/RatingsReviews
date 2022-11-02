@@ -14,7 +14,7 @@ const reviewSchema = new mongoose.Schema(
     reviewer_email: { type: String, required: true, maxLength: 60 },
     helpfulness: { type: Number, required: true },
     reported: { type: Boolean, default: false },
-    response: String,
+    response: { type: String, default: null },
     date: {
       type: Date,
       default: () => {
