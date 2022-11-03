@@ -44,3 +44,34 @@ const reviewTransformer = new Transform({
 });
 
 cleanAndJSONifyFiles('reviews.csv', reviewTransformer);
+
+class BufferedTransform extends Transform {
+  constructor(options) {
+    super(options);
+    this.buffer = [];
+    this.currentIndex = null;
+  }
+}
+
+const photoTransformer = new BufferedTransform({
+  objectMode: true,
+  transform(chunk, encoding, callback) {
+    console.log(`Processing line: ${chunk.id}`);
+    if (this.buffer.length === 0) {
+      this.currentIndex = chunk.review_id;
+      this.buffer.push(chunk.url);
+      callback(null, '');
+    } else if (this.currentIndex === chunk.review_id) {
+      this.buffer.push(chunk.url);
+      callback(null, '');
+    } else {
+      const output = {};
+      output[this.currentIndex] = this.buffer;
+      this.currentIndex = chunk.review_id;
+      this.buffer = [chunk.url];
+      callback(null, `${JSON.stringify(output)}\n`);
+    }
+  },
+});
+
+cleanAndJSONifyFiles('reviews_photos.csv', photoTransformer);
