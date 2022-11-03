@@ -6,6 +6,9 @@ const { Review } = require('./db');
 const cleanAndLoadReviews = () => {
   const readStream = fs.createReadStream(path.join(__dirname, '../../datafiles/reviews.csv'));
   const writeStream = fs.createWriteStream(
+    path.join(__dirname, '../../datafiles/cleanedFiles/reviews.csv')
+  );
+  const logWriteStream = fs.createWriteStream(
     path.join(__dirname, `../../datafiles/logs/review_etl.txt`)
   );
 
@@ -13,22 +16,24 @@ const cleanAndLoadReviews = () => {
     .pipe(csv())
     .on('data', (data) => {
       console.log(`Processing record ${data.id}`);
-      Review.create({
-        id: data.id,
-        rating: data.rating,
-        summary: data.summary,
-        recommend: data.recommend,
-        body: data.body,
-        reviewer_name: data.reviewer_name,
-        product_id: data.product_id,
-        reviewer_email: data.reviewer_email,
-        helpfulness: data.helpfulness,
-        reported: data.reported,
-        response: data.response,
-        date: data.date,
-        photos: [],
-        characteristics: [],
-      }).catch((err) => writeStream.write(`${JSON.stringify(err)}\n`));
+      writeStream.write(
+        `${JSON.stringify({
+          id: data.id,
+          rating: data.rating,
+          summary: data.summary,
+          recommend: data.recommend,
+          body: data.body,
+          reviewer_name: data.reviewer_name,
+          product_id: data.product_id,
+          reviewer_email: data.reviewer_email,
+          helpfulness: data.helpfulness,
+          reported: data.reported,
+          response: data.response,
+          date: data.date,
+          photos: [],
+          characteristics: [],
+        })}\n`
+      );
     })
     .on('end', () => {
       console.log('successfully cleaned and imported reviews');
