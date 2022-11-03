@@ -54,49 +54,39 @@ class BufferedTransform extends Transform {
   }
 }
 
-const photoTransformer = new BufferedTransform({
-  objectMode: true,
-  transform(chunk, encoding, callback) {
-    console.log(`Processing photo line: ${chunk.id}`);
-    if (this.buffer.length === 0) {
-      this.currentIndex = chunk.review_id;
-      this.buffer.push(chunk.url);
-      callback(null, '');
-    } else if (this.currentIndex === chunk.review_id) {
-      this.buffer.push(chunk.url);
-      callback(null, '');
-    } else {
-      const output = { review_id: this.currentIndex, contents: this.buffer };
-      this.currentIndex = chunk.review_id;
-      this.buffer = [chunk.url];
-      callback(null, `${JSON.stringify(output)}\n`);
-    }
-  },
-});
+const makeBufferedTransform = (dataName, mapFunc) => {
+  return new BufferedTransform({
+    objectMode: true,
+    transform(chunk, encoding, callback) {
+      console.log(`Processing ${dataName} line ${chunk.id}`);
+      if (this.buffer.length === 0) {
+        this.currentIndex = chunk.review_id;
+        this.buffer.push(mapFunc(chunk));
+        callback(null, '');
+      } else if (this.currentIndex === chunk.review_id) {
+        this.buffer.push(mapFunc(chunk));
+        callback(null, '');
+      } else {
+        const output = { review_id: this.currentIndex, contents: this.buffer };
+        this.currentIndex = chunk.review_id;
+        this.buffer = [mapFunc(chunk)];
+        callback(null, `${JSON.stringify(output)}\n`);
+      }
+    },
+  });
+};
 
-const characteristicsReviewsTransformer = new BufferedTransform({
-  objectMode: true,
-  transform(chunk, encoding, callback) {
-    console.log(`Processing characteristic_reviews line: ${chunk.id}`);
-    const characteristicReview = {
+const photoTransformer = makeBufferedTransform('photo', (chunk) => chunk.url);
+
+const characteristicsReviewsTransformer = makeBufferedTransform(
+  'characteristics_reviews',
+  (chunk) => {
+    return {
       characteristic_id: chunk.characteristic_id,
       value: chunk.value,
     };
-    if (this.buffer.length === 0) {
-      this.currentIndex = chunk.review_id;
-      this.buffer.push(characteristicReview);
-      callback(null, '');
-    } else if (this.currentIndex === chunk.review_id) {
-      this.buffer.push(characteristicReview);
-      callback(null, '');
-    } else {
-      const output = { review_id: this.currentIndex, contents: this.buffer };
-      this.currentIndex = chunk.review_id;
-      this.buffer = [characteristicReview];
-      callback(null, `${JSON.stringify(output)}\n`);
-    }
-  },
-});
+  }
+);
 
 const characteristicsTransformer = new Transform({
   objectMode: true,
