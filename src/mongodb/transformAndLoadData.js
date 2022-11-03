@@ -16,24 +16,30 @@ const cleanAndLoadReviews = () => {
     .pipe(csv())
     .on('data', (data) => {
       console.log(`Processing record ${data.id}`);
-      writeStream.write(
-        `${JSON.stringify({
-          id: data.id,
-          rating: data.rating,
-          summary: data.summary,
-          recommend: data.recommend,
-          body: data.body,
-          reviewer_name: data.reviewer_name,
-          product_id: data.product_id,
-          reviewer_email: data.reviewer_email,
-          helpfulness: data.helpfulness,
-          reported: data.reported,
-          response: data.response,
-          date: data.date,
-          photos: [],
-          characteristics: [],
-        })}\n`
-      );
+      const reviewDoc = new Review({
+        id: data.id,
+        rating: data.rating,
+        summary: data.summary,
+        recommend: data.recommend,
+        body: data.body,
+        reviewer_name: data.reviewer_name,
+        product_id: data.product_id,
+        reviewer_email: data.reviewer_email,
+        helpfulness: data.helpfulness,
+        reported: data.reported,
+        response: data.response,
+        date: data.date,
+        photos: [],
+        characteristics: [],
+      });
+      reviewDoc
+        .validate()
+        .then(() => {
+          writeStream.write(`${JSON.stringify(reviewDoc.toJSON())}\n`);
+        })
+        .catch((err) => {
+          logWriteStream.write(JSON.stringify(err));
+        });
     })
     .on('end', () => {
       console.log('successfully cleaned and imported reviews');
