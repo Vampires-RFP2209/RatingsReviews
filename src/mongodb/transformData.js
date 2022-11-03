@@ -2,6 +2,8 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const path = require('path');
 const { Transform } = require('stream');
+const LineByLineReader = require('line-by-line');
+const NReadlines = require('n-readlines');
 
 const cleanAndJSONifyFiles = (filename, transformer) => {
   return new Promise((resolve) => {
@@ -96,7 +98,56 @@ const characteristicsTransformer = new Transform({
   },
 });
 
+const mergeCharacteristics = () => {
+  const characteristicReviewsReader = new LineByLineReader(
+    path.join(__dirname, '../../datafiles/cleanedFiles/characteristic_reviews.csv')
+  );
+  const characteristicsReader = new NReadlines(
+    path.join(__dirname, '../../datafiles/cleanedFiles/characteristics.csv')
+  );
+  const writeStream = fs.createWriteStream(
+    path.join(__dirname, '../../datafiles/cleanedFiles/characteristicsMerged.csv')
+  );
+
+  let characteristicsBuffer = null;
+  let currentCharacteristicId = 0;
+  let currentLine = 1;
+
+  characteristicReviewsReader.on('line', (line) => {
+    const characteristicReviewsLine = JSON.parse(line);
+    console.log(`Processing line: ${currentLine}`);
+    currentLine += 1;
+    const maxCharacteristicId = parseInt(
+      characteristicReviewsLine.contents[characteristicReviewsLine.contents.length - 1]
+        .characteristic_id,
+      10
+    );
+
+    if (maxCharacteristicId > currentCharacteristicId) {
+      characteristicsBuffer = {};
+      for (let i = currentCharacteristicId; i < maxCharacteristicId; i += 1) {
+        const characteristicsLine = JSON.parse(characteristicsReader.next().toString('ascii'));
+        characteristicsBuffer[characteristicsLine.id] = characteristicsLine.name;
+      }
+      currentCharacteristicId = maxCharacteristicId;
+    }
+
+    characteristicReviewsLine.contents = characteristicReviewsLine.contents.map((item) => {
+      return {
+        characteristic_id: item.characteristic_id,
+        value: item.value,
+        name: characteristicsBuffer[item.characteristic_id],
+      };
+    });
+
+    writeStream.write(`${JSON.stringify(characteristicReviewsLine)}\n`);
+  });
+
+  characteristicReviewsReader.on('end', () => writeStream.end());
+};
+
 cleanAndJSONifyFiles('reviews.csv', reviewTransformer)
   .then(() => cleanAndJSONifyFiles('reviews_photos.csv', photoTransformer))
   .then(() => cleanAndJSONifyFiles('characteristic_reviews.csv', characteristicsReviewsTransformer))
-  .then(() => cleanAndJSONifyFiles('characteristics.csv', characteristicsTransformer));
+  .then(() => cleanAndJSONifyFiles('characteristics.csv', characteristicsTransformer))
+  .then(() => mergeCharacteristics());
