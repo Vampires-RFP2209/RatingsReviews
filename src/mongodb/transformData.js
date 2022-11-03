@@ -151,6 +151,48 @@ const mergeCharacteristics = () => {
   });
 };
 
+const mergeReviews = () => {
+  const reviewsReader = new LineByLineReader(
+    path.join(__dirname, '../../datafiles/cleanedFiles/reviews.csv')
+  );
+  const characteristicsMergedReader = new NReadlines(
+    path.join(__dirname, '../../datafiles/cleanedFiles/characteristicsMerged.csv')
+  );
+  const photosReader = new NReadlines(
+    path.join(__dirname, '../../datafiles/cleanedFiles/reviews_photos.csv')
+  );
+  const writeStream = fs.createWriteStream(
+    path.join(__dirname, '../../datafiles/cleanedFiles/reviewsMerged.csv')
+  );
+
+  let photosBuffer = null;
+  let currentLine = 1;
+
+  reviewsReader.on('line', (line) => {
+    console.log(`Processing line ${currentLine}`);
+    currentLine += 1;
+    const reviewsLine = JSON.parse(line);
+    const characteristicsMergedLine = JSON.parse(
+      characteristicsMergedReader.next().toString('ascii')
+    );
+    if (photosBuffer === null) {
+      photosBuffer = JSON.parse(photosReader.next().toString('ascii'));
+    }
+
+    reviewsLine.characteristics = characteristicsMergedLine.contents;
+    if (photosBuffer.review_id === reviewsLine.id) {
+      reviewsLine.photos = photosBuffer.contents;
+      photosBuffer = null;
+    }
+
+    writeStream.write(`${JSON.stringify(reviewsLine)}\n`);
+  });
+
+  reviewsReader.on('end', () => {
+    writeStream.end();
+  });
+};
+
 cleanAndJSONifyFiles('reviews.csv', reviewTransformer)
   .then(() => cleanAndJSONifyFiles('reviews_photos.csv', photoTransformer))
   .then(() => cleanAndJSONifyFiles('characteristic_reviews.csv', characteristicsReviewsTransformer))
