@@ -6,7 +6,7 @@ const { Review } = require('./db');
 const cleanAndLoadReviews = () => {
   const readStream = fs.createReadStream(path.join(__dirname, '../../datafiles/reviews.csv'));
   const writeStream = fs.createWriteStream(
-    path.join(__dirname, `../../datafiles/logs/review_etl_${new Date().toJSON()}.txt`)
+    path.join(__dirname, `../../datafiles/logs/review_etl.txt`)
   );
 
   readStream
@@ -25,12 +25,10 @@ const cleanAndLoadReviews = () => {
         helpfulness: data.helpfulness,
         reported: data.reported,
         response: data.response,
-        date: new Date(data.date),
+        date: data.date,
         photos: [],
         characteristics: [],
-      })
-        .then((result) => writeStream.write(result))
-        .catch((err) => writeStream.write(err));
+      }).catch((err) => writeStream.write(`${JSON.stringify(err)}\n`));
     })
     .on('end', () => {
       console.log('successfully cleaned and imported reviews');
