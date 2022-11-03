@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/Vampires-RFP2209/RatingsReviews#readme",
   "dependencies": {
+    "csv-parser": "^3.0.0",
     "dotenv": "^16.0.3",
     "mongoose": "^6.7.0",
     "mysql2": "^2.3.3"
