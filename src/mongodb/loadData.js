@@ -24,7 +24,7 @@ const importFileToDB = (filename, insertionFunc) => {
     });
 
     lineReader.on('end', () => {
-      console.log('Finsihed importing files');
+      console.log('Finshed importing files');
       resolve();
     });
   });
