@@ -10,6 +10,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "nodemon": "^2.0.20",
     "prettier": "^2.7.1"
   },
   "name": "ratingsreviews",
@@ -17,7 +18,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "server-dev": "npx nodemon --watch src src/index.js"
   },
   "repository": {
     "type": "git",
