@@ -78,3 +78,32 @@ module.exports.incrementHelpfulness = (reviewId) => {
 module.exports.updateReview = (reviewId, updatedData) => {
   return Review.findOneAndUpdate({ _id: new ObjectId(reviewId) }, updatedData);
 };
+
+module.exports.addReview = (review) => {
+  return Review.findOne({ product_id: review.product_id }).then((result) => {
+    const characteristics = [];
+    Object.keys(review.characteristics).forEach((characteristicId) => {
+      characteristics.push(
+        new Characteristic({
+          characteristic_id: characteristicId,
+          value: review.characteristics[characteristicId],
+          name: result.characteristics.find(
+            (e) => e.characteristic_id === parseInt(characteristicId, 10)
+          ).name,
+        })
+      );
+    });
+
+    return Review.create({
+      rating: review.rating,
+      summary: review.summary,
+      recommend: review.recommend,
+      body: review.body,
+      reviewer_name: review.name,
+      reviewer_email: review.email,
+      product_id: review.product_id,
+      photos: review.photos,
+      characteristics,
+    });
+  });
+};

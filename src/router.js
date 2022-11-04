@@ -27,7 +27,9 @@ router.get('/reviews/meta', (req, res) => {
     });
 });
 
-router.post('/reviews', (req, res) => {});
+router.post('/reviews', (req, res) => {
+  models.addReview(req.body).then(() => res.sendStatus(201));
+});
 
 router.put('/reviews/:review_id/helpful', (req, res) => {
   models.incrementHelpfulness(req.params.review_id).then(() => res.sendStatus(200));
