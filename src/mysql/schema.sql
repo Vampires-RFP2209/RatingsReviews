@@ -4,7 +4,7 @@ USE ratings_reviews;
 CREATE TABLE IF NOT EXISTS reviews (
   id INT PRIMARY KEY AUTO_INCREMENT,
   rating INT NOT NULL,
-  summary VARCHAR(60),
+  summary TEXT,
   recommend BOOLEAN NOT NULL,
   body VARCHAR(1000) NOT NULL,
   reviewer_name VARCHAR(60) NOT NULL,
@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   product_id INT NOT NULL,
   helpfulness INT DEFAULT 0,
   reported BOOLEAN DEFAULT 0,
+  response TEXT,
   date DATE DEFAULT (CURRENT_DATE),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -39,7 +40,7 @@ CREATE TABLE IF NOT EXISTS characteristic_values (
   id INT PRIMARY KEY AUTO_INCREMENT,
   `value` INT NOT NULL,
   review_id INT NOT NULL,
-  characterisic_id INT NOT NULL,
+  characteristic_id INT NOT NULL,
   FOREIGN KEY (review_id) REFERENCES reviews(id),
-  FOREIGN KEY (characterisic_id) REFERENCES characteristics(id)
+  FOREIGN KEY (characteristic_id) REFERENCES characteristics(id)
 );
