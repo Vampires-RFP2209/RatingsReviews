@@ -8,3 +8,5 @@ app.use(morgan('combined'));
 app.use(express.json());
 
 app.use(router);
+
+module.exports = app;
