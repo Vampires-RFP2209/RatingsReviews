@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongoose').Types;
 const { Review, Characteristic } = require('./db');
 
 // TODO: Create relevant sort option
@@ -68,4 +69,8 @@ module.exports.getMetadata = (productId) => {
       };
     }
   );
+};
+
+module.exports.incrementHelpfulness = (reviewId) => {
+  return Review.findOneAndUpdate({ _id: new ObjectId(reviewId) }, { $inc: { helpfulness: 1 } });
 };
