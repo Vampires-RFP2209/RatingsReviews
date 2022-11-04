@@ -75,6 +75,12 @@ const makeBufferedTransform = (dataName, mapFunc) => {
         callback(null, `${JSON.stringify(output)}\n`);
       }
     },
+    flush(callback) {
+      callback(
+        null,
+        `${JSON.stringify({ review_id: this.currentIndex, contents: this.buffer })}\n`
+      );
+    },
   });
 };
 
