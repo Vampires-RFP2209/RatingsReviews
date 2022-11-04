@@ -11,12 +11,13 @@ const characteristicSchema = new mongoose.Schema({
 
 const reviewSchema = new mongoose.Schema(
   {
+    id: Number,
     rating: { type: Number, required: true },
-    summary: { type: String, maxLength: 60 },
+    summary: String,
     recommend: { type: Boolean, required: true },
     body: { type: String, required: true, maxLength: 1000 },
     reviewer_name: { type: String, required: true, maxLength: 60 },
-    product_id: { type: Number, required: true },
+    product_id: { type: Number, required: true, index: true },
     reviewer_email: { type: String, required: true, maxLength: 60 },
     helpfulness: { type: Number, default: 0 },
     reported: { type: Boolean, default: false },
