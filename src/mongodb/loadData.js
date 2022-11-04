@@ -34,4 +34,4 @@ const reviewInserter = (line) => {
   return Review.create(JSON.parse(line));
 };
 
-importFileToDB('reviewsMerged.csv', reviewInserter);
+module.exports = () => importFileToDB('reviewsMerged.csv', reviewInserter);

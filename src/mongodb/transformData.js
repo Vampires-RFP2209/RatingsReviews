@@ -199,9 +199,12 @@ const mergeReviews = () => {
   });
 };
 
-cleanAndJSONifyFiles('reviews.csv', reviewTransformer)
-  .then(() => cleanAndJSONifyFiles('reviews_photos.csv', photoTransformer))
-  .then(() => cleanAndJSONifyFiles('characteristic_reviews.csv', characteristicsReviewsTransformer))
-  .then(() => cleanAndJSONifyFiles('characteristics.csv', characteristicsTransformer))
-  .then(() => mergeCharacteristics())
-  .then(() => mergeReviews());
+module.exports = () =>
+  cleanAndJSONifyFiles('reviews.csv', reviewTransformer)
+    .then(() => cleanAndJSONifyFiles('reviews_photos.csv', photoTransformer))
+    .then(() =>
+      cleanAndJSONifyFiles('characteristic_reviews.csv', characteristicsReviewsTransformer)
+    )
+    .then(() => cleanAndJSONifyFiles('characteristics.csv', characteristicsTransformer))
+    .then(() => mergeCharacteristics())
+    .then(() => mergeReviews());
