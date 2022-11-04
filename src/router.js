@@ -33,6 +33,8 @@ router.put('/reviews/:review_id/helpful', (req, res) => {
   models.incrementHelpfulness(req.params.review_id).then(() => res.sendStatus(200));
 });
 
-router.put('/reviews/:review_id/report', (req, res) => {});
+router.put('/reviews/:review_id/report', (req, res) => {
+  models.updateReview(req.params.review_id, { reported: true }).then(() => res.sendStatus(200));
+});
 
 module.exports = router;

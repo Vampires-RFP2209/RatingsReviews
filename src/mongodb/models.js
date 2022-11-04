@@ -9,7 +9,7 @@ const SORT_OPTIONS = {
 };
 
 module.exports.getReviews = (productId, page = 1, count = 5, sort = 'relevant') => {
-  return Review.find({ product_id: productId }, null, {
+  return Review.find({ product_id: productId, reported: false }, null, {
     sort: SORT_OPTIONS[sort],
     skip: count * (page - 1),
     limit: count,
@@ -73,4 +73,8 @@ module.exports.getMetadata = (productId) => {
 
 module.exports.incrementHelpfulness = (reviewId) => {
   return Review.findOneAndUpdate({ _id: new ObjectId(reviewId) }, { $inc: { helpfulness: 1 } });
+};
+
+module.exports.updateReview = (reviewId, updatedData) => {
+  return Review.findOneAndUpdate({ _id: new ObjectId(reviewId) }, updatedData);
 };
