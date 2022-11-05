@@ -31,7 +31,13 @@ module.exports.getMetadata = (productId) => {
     { $match: { product_id: productIdNum } },
     { $group: { _id: '$rating', count: { $count: {} } } },
   ]).then((result) => {
-    return Object.fromEntries(result.map((row) => Object.values(row)));
+    const output = Object.fromEntries(result.map((row) => Object.values(row)));
+    [1, 2, 3, 4, 5].forEach((e) => {
+      if (!output[e]) {
+        output[e] = 0;
+      }
+    });
+    return output;
   });
 
   const recommendAggregation = Review.aggregate([
