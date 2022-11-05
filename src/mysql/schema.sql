@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS reviews (
   reported BOOLEAN DEFAULT 0,
   response TEXT,
   date DATE DEFAULT (CURRENT_DATE),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX (product_id)
 );
 
 CREATE TABLE IF NOT EXISTS photos (
@@ -26,7 +27,7 @@ CREATE TABLE IF NOT EXISTS photos (
 
 CREATE TABLE IF NOT EXISTS characteristic_names (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  characterisic TEXT NOT NULL
+  characteristic TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS characteristics (
