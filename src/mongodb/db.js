@@ -33,8 +33,13 @@ const reviewSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true },
   }
 );
+reviewSchema.virtual('review_id').get(function () {
+  return this._id;
+});
 
 const Review = mongoose.model('Review', reviewSchema);
 const Characteristic = mongoose.model('Characteristic', characteristicSchema);
