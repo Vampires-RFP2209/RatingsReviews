@@ -28,7 +28,7 @@ const reviewSchema = new mongoose.Schema(
         return new Date().setUTCHours(0, 0, 0, 0);
       },
     },
-    photos: { type: [String], required: true },
+    photos: { type: [mongoose.Schema.Types.Mixed], required: true },
     characteristics: { type: [characteristicSchema], required: true },
   },
   {
