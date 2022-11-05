@@ -9,11 +9,15 @@ const SORT_OPTIONS = {
 };
 
 module.exports.getReviews = (productId, page = 1, count = 5, sort = 'relevant') => {
-  return Review.find({ product_id: productId, reported: false }, null, {
-    sort: SORT_OPTIONS[sort],
-    skip: count * (page - 1),
-    limit: count,
-  }).then((docs) => {
+  return Review.find(
+    { product_id: productId, reported: false },
+    { _id: 0, id: 0, createdAt: 0, updatedAt: 0, __v: 0, reported: 0 },
+    {
+      sort: SORT_OPTIONS[sort],
+      skip: count * (page - 1),
+      limit: count,
+    }
+  ).then((docs) => {
     return {
       product: productId,
       page,
