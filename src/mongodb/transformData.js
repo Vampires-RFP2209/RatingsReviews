@@ -31,7 +31,7 @@ const reviewTransformer = new Transform({
     const reviewDoc = {
       id: chunk.id,
       rating: chunk.rating,
-      summary: chunk.summary,
+      summary: chunk.summary === 'null' ? null : chunk.summary,
       recommend: chunk.recommend,
       body: chunk.body,
       reviewer_name: chunk.reviewer_name,
@@ -39,7 +39,7 @@ const reviewTransformer = new Transform({
       reviewer_email: chunk.reviewer_email,
       helpfulness: chunk.helpfulness,
       reported: chunk.reported,
-      response: chunk.response,
+      response: chunk.response === 'null' ? null : chunk.response,
       date: chunk.date,
       photos: [],
       characteristics: [],
@@ -84,7 +84,9 @@ const makeBufferedTransform = (dataName, mapFunc) => {
   });
 };
 
-const photoTransformer = makeBufferedTransform('photo', (chunk) => chunk.url);
+const photoTransformer = makeBufferedTransform('photo', (chunk) => {
+  return { id: chunk.id, url: chunk.url };
+});
 
 const characteristicsReviewsTransformer = makeBufferedTransform(
   'characteristics_reviews',
@@ -122,7 +124,7 @@ const mergeCharacteristics = () => {
 
     characteristicReviewsReader.on('line', (line) => {
       const characteristicReviewsLine = JSON.parse(line);
-      console.log(`Processing line: ${currentLine}`);
+      console.log(`Processing mergeCharacteristics line: ${currentLine}`);
       currentLine += 1;
       const maxCharacteristicId = parseInt(
         characteristicReviewsLine.contents[characteristicReviewsLine.contents.length - 1]
@@ -158,44 +160,47 @@ const mergeCharacteristics = () => {
 };
 
 const mergeReviews = () => {
-  const reviewsReader = new LineByLineReader(
-    path.join(__dirname, '../../datafiles/cleanedFiles/reviews.csv')
-  );
-  const characteristicsMergedReader = new NReadlines(
-    path.join(__dirname, '../../datafiles/cleanedFiles/characteristicsMerged.csv')
-  );
-  const photosReader = new NReadlines(
-    path.join(__dirname, '../../datafiles/cleanedFiles/reviews_photos.csv')
-  );
-  const writeStream = fs.createWriteStream(
-    path.join(__dirname, '../../datafiles/cleanedFiles/reviewsMerged.csv')
-  );
-
-  let photosBuffer = null;
-  let currentLine = 1;
-
-  reviewsReader.on('line', (line) => {
-    console.log(`Processing line ${currentLine}`);
-    currentLine += 1;
-    const reviewsLine = JSON.parse(line);
-    const characteristicsMergedLine = JSON.parse(
-      characteristicsMergedReader.next().toString('ascii')
+  return new Promise((resolve) => {
+    const reviewsReader = new LineByLineReader(
+      path.join(__dirname, '../../datafiles/cleanedFiles/reviews.csv')
     );
-    if (photosBuffer === null) {
-      photosBuffer = JSON.parse(photosReader.next().toString('ascii'));
-    }
+    const characteristicsMergedReader = new NReadlines(
+      path.join(__dirname, '../../datafiles/cleanedFiles/characteristicsMerged.csv')
+    );
+    const photosReader = new NReadlines(
+      path.join(__dirname, '../../datafiles/cleanedFiles/reviews_photos.csv')
+    );
+    const writeStream = fs.createWriteStream(
+      path.join(__dirname, '../../datafiles/cleanedFiles/reviewsMerged.csv')
+    );
 
-    reviewsLine.characteristics = characteristicsMergedLine.contents;
-    if (photosBuffer.review_id === reviewsLine.id) {
-      reviewsLine.photos = photosBuffer.contents;
-      photosBuffer = null;
-    }
+    let photosBuffer = null;
+    let currentLine = 1;
 
-    writeStream.write(`${JSON.stringify(reviewsLine)}\n`);
-  });
+    reviewsReader.on('line', (line) => {
+      console.log(`Processing merge reviews line ${currentLine}`);
+      currentLine += 1;
+      const reviewsLine = JSON.parse(line);
+      const characteristicsMergedLine = JSON.parse(
+        characteristicsMergedReader.next().toString('ascii')
+      );
+      if (photosBuffer === null) {
+        photosBuffer = JSON.parse(photosReader.next().toString('ascii'));
+      }
 
-  reviewsReader.on('end', () => {
-    writeStream.end();
+      reviewsLine.characteristics = characteristicsMergedLine.contents;
+      if (photosBuffer.review_id === reviewsLine.id) {
+        reviewsLine.photos = photosBuffer.contents;
+        photosBuffer = null;
+      }
+
+      writeStream.write(`${JSON.stringify(reviewsLine)}\n`);
+    });
+
+    reviewsReader.on('end', () => {
+      writeStream.end();
+      resolve();
+    });
   });
 };
 
