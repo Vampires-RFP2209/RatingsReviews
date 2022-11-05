@@ -36,19 +36,7 @@ module.exports.getReviews = (productId, page = 1, count = 5, sort = 'relevant') 
         [productId, (page - 1) * count, parseInt(count, 10)]
       );
     })
-    .then((result) => result[0]);
+    .then((result) => {
+      return { product: productId, page, count, results: result[0] };
+    });
 };
-
-/*
-WITH characteristics_merged AS
-        (SELECT
-          cv.id,
-          cv.review_id,
-          cv.value,
-          cn.characteristic
-        FROM characteristic_values as cv
-        LEFT JOIN characteristics AS c
-          ON (cv.characteristic_id=c.id)
-        LEFT JOIN characteristic_names AS cn
-          ON (c.characteristic_name_id=cn.id))
-*/
