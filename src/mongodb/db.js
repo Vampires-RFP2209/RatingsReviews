@@ -28,7 +28,7 @@ const reviewSchema = new mongoose.Schema(
         return new Date().setUTCHours(0, 0, 0, 0);
       },
     },
-    photos: { type: [String], required: true },
+    photos: { type: [mongoose.Schema.Types.Mixed], required: true },
     characteristics: { type: [characteristicSchema], required: true },
   },
   {
@@ -37,9 +37,6 @@ const reviewSchema = new mongoose.Schema(
     toJSON: { virtuals: true },
   }
 );
-reviewSchema.virtual('review_id').get(function () {
-  return this._id;
-});
 
 const Review = mongoose.model('Review', reviewSchema);
 const Characteristic = mongoose.model('Characteristic', characteristicSchema);
