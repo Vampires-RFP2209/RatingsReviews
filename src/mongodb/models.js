@@ -1,23 +1,60 @@
 const { ObjectId } = require('mongoose').Types;
 const { Review, Characteristic } = require('./db');
 
-// TODO: Create relevant sort option
 const SORT_OPTIONS = {
-  relevant: null,
+  relevant: { weightedHelpfulness: -1 },
   helpful: { helpfulness: -1 },
   newest: { date: -1 },
 };
 
 module.exports.getReviews = (productId, page = 1, count = 5, sort = 'relevant') => {
-  return Review.find(
-    { product_id: productId, reported: false },
-    { id: 0, createdAt: 0, updatedAt: 0, __v: 0, reported: 0 },
+  return Review.aggregate([
+    { $match: { product_id: parseInt(productId, 10) } },
+    sort === 'relevant'
+      ? {
+          $addFields: {
+            weightedHelpfulness: {
+              $multiply: [
+                '$helpfulness',
+                {
+                  $subtract: [
+                    1,
+                    {
+                      $min: [
+                        0.8,
+                        {
+                          $multiply: [
+                            0.1,
+                            {
+                              $dateDiff: { startDate: '$date', endDate: new Date(), unit: 'month' },
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        }
+      : { $skip: 0 },
+    { $sort: SORT_OPTIONS[sort] },
+    { $skip: count * (page - 1) },
+    { $limit: count },
+    { $addFields: { review_id: '$_id' } },
     {
-      sort: SORT_OPTIONS[sort],
-      skip: count * (page - 1),
-      limit: count,
-    }
-  ).then((docs) => {
+      $project: {
+        _id: 0,
+        id: 0,
+        reported: 0,
+        createdAt: 0,
+        updatedAt: 0,
+        __v: 0,
+        weightedHelpfulness: 0,
+      },
+    },
+  ]).then((docs) => {
     return {
       product: productId,
       page,
