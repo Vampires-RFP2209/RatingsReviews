@@ -11,7 +11,7 @@ const SORT_OPTIONS = {
 module.exports.getReviews = (productId, page = 1, count = 5, sort = 'relevant') => {
   return Review.find(
     { product_id: productId, reported: false },
-    { _id: 0, id: 0, createdAt: 0, updatedAt: 0, __v: 0, reported: 0 },
+    { id: 0, createdAt: 0, updatedAt: 0, __v: 0, reported: 0 },
     {
       sort: SORT_OPTIONS[sort],
       skip: count * (page - 1),
@@ -34,11 +34,12 @@ module.exports.getMetadata = (productId) => {
   const ratingAggregation = Review.aggregate([
     { $match: { product_id: productIdNum } },
     { $group: { _id: '$rating', count: { $count: {} } } },
+    { $project: { count: { $convert: { input: '$count', to: 'string' } } } },
   ]).then((result) => {
     const output = Object.fromEntries(result.map((row) => Object.values(row)));
     [1, 2, 3, 4, 5].forEach((e) => {
       if (!output[e]) {
-        output[e] = 0;
+        output[e] = '0';
       }
     });
     return output;
@@ -47,6 +48,7 @@ module.exports.getMetadata = (productId) => {
   const recommendAggregation = Review.aggregate([
     { $match: { product_id: productIdNum } },
     { $group: { _id: '$recommend', count: { $count: {} } } },
+    { $project: { count: { $convert: { input: '$count', to: 'string' } } } },
   ]).then((result) => {
     return Object.fromEntries(result.map((row) => Object.values(row)));
   });
