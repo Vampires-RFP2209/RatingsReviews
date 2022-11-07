@@ -19,5 +19,8 @@
     "no-console": "off",
     "func-names": "off",
     "object-shorthand": "off"
+  },
+  "env": {
+    "jest": true
   }
 }
