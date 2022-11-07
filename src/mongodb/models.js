@@ -41,7 +41,7 @@ module.exports.getReviews = (productId, page = 1, count = 5, sort = 'relevant') 
       : { $skip: 0 },
     { $sort: SORT_OPTIONS[sort] },
     { $skip: count * (page - 1) },
-    { $limit: count },
+    { $limit: parseInt(count, 10) },
     { $addFields: { review_id: '$_id' } },
     {
       $project: {
