@@ -108,3 +108,5 @@ datafiles/
 .DS_Store
 
 artillery_test_scripts/
+
+newrelic.js
