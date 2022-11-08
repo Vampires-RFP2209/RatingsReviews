@@ -38,7 +38,24 @@ const reviewSchema = new mongoose.Schema(
 
 reviewSchema.index({ product_id: 1, helpfulness: -1, date: -1 });
 
+const reviewMetadataSchema = new mongoose.Schema({
+  product_id: { type: Number, required: true, index: true },
+  ratings: {
+    1: { type: String, required: true },
+    2: { type: String, required: true },
+    3: { type: String, required: true },
+    4: { type: String, required: true },
+    5: { type: String, required: true },
+  },
+  recommended: {
+    true: { type: String, required: true },
+    false: { type: String, required: false },
+  },
+  characteristics: mongoose.Schema.Types.Mixed,
+});
+
 const Review = mongoose.model('Review', reviewSchema);
 const Characteristic = mongoose.model('Characteristic', characteristicSchema);
+const ReviewMetadata = mongoose.model('Metadata', reviewMetadataSchema);
 
-module.exports = { Review, Characteristic };
+module.exports = { Review, Characteristic, ReviewMetadata };
