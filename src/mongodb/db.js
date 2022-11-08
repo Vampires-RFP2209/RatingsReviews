@@ -17,7 +17,7 @@ const reviewSchema = new mongoose.Schema(
     recommend: { type: Boolean, required: true },
     body: { type: String, required: true, maxLength: 1000 },
     reviewer_name: { type: String, required: true, maxLength: 60 },
-    product_id: { type: Number, required: true, index: true },
+    product_id: { type: Number, required: true },
     reviewer_email: { type: String, required: true, maxLength: 60 },
     helpfulness: { type: Number, default: 0 },
     reported: { type: Boolean, default: false },
@@ -35,6 +35,8 @@ const reviewSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+reviewSchema.index({ product_id: 1, helpfulness: -1, date: -1 });
 
 const Review = mongoose.model('Review', reviewSchema);
 const Characteristic = mongoose.model('Characteristic', characteristicSchema);
