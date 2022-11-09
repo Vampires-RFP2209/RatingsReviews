@@ -110,3 +110,5 @@ datafiles/
 artillery_test_scripts/
 
 /newrelic.js
+
+*.cer
