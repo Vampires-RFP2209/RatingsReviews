@@ -1,12 +1,7 @@
 const express = require('express');
-const path = require('path');
 const models = require('./mongodb/models');
 
 const router = express.Router();
-
-router.get('/loaderio-81b88f6bcd718a7484d1fca2265c758f', (req, res) => {
-  res.sendFile(path.join(__dirname, `../${process.env.LOADERIO_FILE}`));
-});
 
 router.get('/reviews', (req, res) => {
   models
